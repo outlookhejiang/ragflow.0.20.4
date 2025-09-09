@@ -74,7 +74,8 @@ export default {
       continue: 'Continue',
       title: 'Start building your smart assistants.',
       description:
-        'Sign up for free to explore top RAG technology. Create knowledge bases and AIs to empower your business.',
+        // 'Sign up for free to explore top RAG technology. Create knowledge bases and AIs to empower your business.',
+        'Create knowledge bases and AIs to empower your business.',
       review: 'from 500+ reviews',
     },
     header: {
