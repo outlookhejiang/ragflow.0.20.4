@@ -1,30 +1,20 @@
-import { BulkOperateBar } from '@/components/bulk-operate-bar';
-import { FileUploadDialog } from '@/components/file-upload-dialog';
-import ListFilterBar from '@/components/list-filter-bar';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useRowSelection } from '@/hooks/logic-hooks/use-row-selection';
 import { useFetchFileList } from '@/hooks/use-file-request';
-import { Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { CreateFolderDialog } from './create-folder-dialog';
-import { FileBreadcrumb } from './file-breadcrumb';
-import { FilesTable } from './files-table';
-import { MoveDialog } from './move-dialog';
+import { useSearchParams } from 'umi';
+import { FileContent } from './FileContent';
+import { FileContextProvider } from './FileContext';
+import FolderTree from './FolderTree';
 import { useBulkOperateFile } from './use-bulk-operate-file';
 import { useHandleCreateFolder } from './use-create-folder';
 import { useHandleMoveFile } from './use-move-file';
 import { useSelectBreadcrumbItems } from './use-navigate-to-folder';
 import { useHandleUploadFile } from './use-upload-file';
 
-export default function Files() {
+function FilesPage() {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const {
     fileUploadVisible,
     hideFileUploadModal,
@@ -76,78 +66,58 @@ export default function Files() {
 
   const breadcrumbItems = useSelectBreadcrumbItems();
 
-  const leftPanel = (
-    <div>
-      {breadcrumbItems.length > 0 ? (
-        <FileBreadcrumb></FileBreadcrumb>
-      ) : (
-        t('fileManager.files')
-      )}
-    </div>
-  );
+  const handleFolderSelect = (folderId: string) => {
+    searchParams.set('folderId', folderId);
+    searchParams.set('page', '1');
+    setSearchParams(searchParams);
+  };
 
   return (
-    <section className="p-8">
-      <ListFilterBar
-        leftPanel={leftPanel}
-        searchString={searchString}
-        onSearchChange={handleInputChange}
-        showFilter={false}
-        icon={'file'}
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button>
-              <Upload />
-              {t('knowledgeDetails.addFile')}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuItem onClick={showFileUploadModal}>
-              {t('fileManager.uploadFile')}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={showFolderCreateModal}>
-              {t('fileManager.newFolder')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </ListFilterBar>
-      {!rowSelectionIsEmpty && (
-        <BulkOperateBar list={list} count={selectedCount}></BulkOperateBar>
-      )}
-      <FilesTable
-        files={files}
-        total={total}
-        pagination={pagination}
-        setPagination={setPagination}
-        loading={loading}
-        rowSelection={rowSelection}
-        setRowSelection={setRowSelection}
-        showMoveFileModal={showMoveFileModal}
-      ></FilesTable>
-      {fileUploadVisible && (
-        <FileUploadDialog
-          hideModal={hideFileUploadModal}
-          onOk={onFileUploadOk}
-          loading={fileUploadLoading}
-        ></FileUploadDialog>
-      )}
-      {folderCreateModalVisible && (
-        <CreateFolderDialog
-          loading={folderCreateLoading}
-          visible={folderCreateModalVisible}
-          hideModal={hideFolderCreateModal}
-          onOk={onFolderCreateOk}
-        ></CreateFolderDialog>
-      )}
-      {moveFileVisible && (
-        <MoveDialog
-          hideModal={hideMoveFileModal}
-          onOk={onMoveFileOk}
-          loading={moveFileLoading}
-        ></MoveDialog>
-      )}
+    <section className="flex h-full">
+      <div className="w-64 border-r overflow-y-auto">
+        <FolderTree onSelect={handleFolderSelect} />
+      </div>
+      <div className="flex-1">
+        <FileContent
+          t={t}
+          fileUploadVisible={fileUploadVisible}
+          hideFileUploadModal={hideFileUploadModal}
+          showFileUploadModal={showFileUploadModal}
+          fileUploadLoading={fileUploadLoading}
+          onFileUploadOk={onFileUploadOk}
+          folderCreateModalVisible={folderCreateModalVisible}
+          showFolderCreateModal={showFolderCreateModal}
+          hideFolderCreateModal={hideFolderCreateModal}
+          folderCreateLoading={folderCreateLoading}
+          onFolderCreateOk={onFolderCreateOk}
+          pagination={pagination}
+          files={files}
+          total={total}
+          loading={loading}
+          setPagination={setPagination}
+          searchString={searchString}
+          handleInputChange={handleInputChange}
+          rowSelection={rowSelection}
+          setRowSelection={setRowSelection}
+          rowSelectionIsEmpty={rowSelectionIsEmpty}
+          selectedCount={selectedCount}
+          showMoveFileModal={showMoveFileModal}
+          moveFileVisible={moveFileVisible}
+          onMoveFileOk={onMoveFileOk}
+          hideMoveFileModal={hideMoveFileModal}
+          moveFileLoading={moveFileLoading}
+          bulkOperateList={list}
+          breadcrumbItems={breadcrumbItems}
+        />
+      </div>
     </section>
+  );
+}
+
+export default function Files() {
+  return (
+    <FileContextProvider>
+      <FilesPage />
+    </FileContextProvider>
   );
 }

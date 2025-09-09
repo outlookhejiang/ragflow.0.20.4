@@ -39,10 +39,6 @@ import { IFile } from '@/interfaces/database/file-manager';
 import { cn } from '@/lib/utils';
 import { formatFileSize } from '@/utils/common-util';
 import { formatDate } from '@/utils/date';
-import {
-  getExtension,
-  isSupportedPreviewDocumentType,
-} from '@/utils/document-util';
 import { pick } from 'lodash';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,12 +67,7 @@ export function FilesTable({
   setRowSelection,
   showMoveFileModal,
 }: FilesTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: 'name',
-      desc: false,
-    },
-  ]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -150,14 +141,6 @@ export function FilesTable({
         const handleNameClick = () => {
           if (isFolder) {
             navigateToOtherFolder(id);
-          } else {
-            const extension = getExtension(name);
-            if (isSupportedPreviewDocumentType(extension)) {
-              window.open(
-                `/document/${id}?ext=${extension}&prefix=file`,
-                '_blank',
-              );
-            }
           }
         };
 
@@ -169,7 +152,7 @@ export function FilesTable({
                   <FileIcon name={name} type={type}></FileIcon>
                 </span>
                 <span
-                  className={cn('truncate', 'cursor-pointer')}
+                  className={cn('truncate', { ['cursor-pointer']: isFolder })}
                   onClick={handleNameClick}
                 >
                   {name}

@@ -1,23 +1,18 @@
 import { useDeleteFile } from '@/hooks/use-file-request';
 import { useCallback } from 'react';
-import { useFileContext } from './FileContext';
 import { useGetFolderId } from './hooks';
 
 export const useHandleDeleteFile = () => {
   const { deleteFile: removeDocument } = useDeleteFile();
   const parentId = useGetFolderId();
-  const { refreshTree } = useFileContext();
 
   const handleRemoveFile = useCallback(
     async (fileIds: string[]) => {
       const code = await removeDocument({ fileIds, parentId });
 
-      if (code === 0) {
-        refreshTree();
-      }
       return code;
     },
-    [parentId, removeDocument, refreshTree],
+    [parentId, removeDocument],
   );
 
   return { handleRemoveFile };

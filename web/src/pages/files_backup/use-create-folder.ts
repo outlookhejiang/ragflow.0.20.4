@@ -1,7 +1,6 @@
 import { useSetModalState } from '@/hooks/common-hooks';
 import { useCreateFolder } from '@/hooks/use-file-request';
 import { useCallback } from 'react';
-import { useFileContext } from './FileContext';
 import { useGetFolderId } from './hooks';
 
 export const useHandleCreateFolder = () => {
@@ -12,7 +11,6 @@ export const useHandleCreateFolder = () => {
   } = useSetModalState();
   const { createFolder, loading } = useCreateFolder();
   const id = useGetFolderId();
-  const { refreshTree } = useFileContext();
 
   const onFolderCreateOk = useCallback(
     async (name: string) => {
@@ -20,10 +18,9 @@ export const useHandleCreateFolder = () => {
 
       if (ret === 0) {
         hideFolderCreateModal();
-        refreshTree();
       }
     },
-    [createFolder, hideFolderCreateModal, id, refreshTree],
+    [createFolder, hideFolderCreateModal, id],
   );
 
   return {
