@@ -1,3 +1,4 @@
+import { IFile } from '@/interfaces/database/file-manager';
 import fileManagerService from '@/services/file-manager-service';
 import { FolderOutlined } from '@ant-design/icons';
 import type { TreeDataNode } from 'antd';
@@ -23,9 +24,9 @@ const FolderTree: React.FC<FolderTreeProps> = ({ onSelect }) => {
     });
     if (data?.data) {
       return data.data.files
-        .filter((file) => isFolderType(file.type))
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((folder) => ({
+        .filter((file: IFile) => isFolderType(file.type))
+        .sort((a: IFile, b: IFile) => a.name.localeCompare(b.name))
+        .map((folder: IFile) => ({
           title: folder.name,
           key: folder.id,
           isLeaf: false,
@@ -36,20 +37,36 @@ const FolderTree: React.FC<FolderTreeProps> = ({ onSelect }) => {
   };
 
   useEffect(() => {
-    // This effect now handles the refresh
     const initLoad = async () => {
       const rootFolders = await fetchFolders('');
       setTreeData(rootFolders);
     };
 
-    // On the initial load (version 0), just load.
-    // On subsequent loads (refreshes), clear everything first to purge the antd Tree's internal cache.
+    // 刷新策略：每次都重新加载，但保持展开状态
     if (treeVersion > 0) {
-      setTreeData([]);
-      setExpandedKeys([]);
-    }
+      // 保存当前的展开状态
+      const currentExpandedKeys = [...expandedKeys];
 
-    initLoad();
+      // 清空数据并重新加载
+      setTreeData([]);
+
+      // 稍微延迟一下重新加载，确保后端数据已经更新
+      setTimeout(async () => {
+        await initLoad();
+        // 恢复之前的展开状态
+        if (currentExpandedKeys.length > 0) {
+          setExpandedKeys(currentExpandedKeys);
+          // 为每个之前展开的节点重新加载子节点
+          for (const key of currentExpandedKeys) {
+            const children = await fetchFolders(key as string);
+            setTreeData((origin) => updateTreeData(origin, key, children));
+          }
+        }
+      }, 200); // 200ms 延迟
+    } else {
+      // 初始加载
+      initLoad();
+    }
   }, [treeVersion]);
 
   const onLoadData: TreeProps['loadData'] = async ({ key, children }) => {
@@ -94,7 +111,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({ onSelect }) => {
 
   return (
     <div className="p-4 h-full overflow-auto">
-      <h2 className="text-lg font-semibold mb-4">Folders</h2>
+      <h2 className="text-lg font-semibold mb-4">知识库目录</h2>
       <Tree
         showIcon
         loadData={onLoadData}

@@ -2,6 +2,7 @@ import { useSetModalState } from '@/hooks/common-hooks';
 import { UseRowSelectionType } from '@/hooks/logic-hooks/use-row-selection';
 import { useMoveFile } from '@/hooks/use-file-request';
 import { useCallback, useRef, useState } from 'react';
+import { useFileContext } from './FileContext';
 
 export const useHandleMoveFile = ({
   clearRowSelection,
@@ -14,6 +15,7 @@ export const useHandleMoveFile = ({
   const { moveFile, loading } = useMoveFile();
   const [sourceFileIds, setSourceFileIds] = useState<string[]>([]);
   const isBulkRef = useRef(false);
+  const { refreshTree } = useFileContext();
 
   const onMoveFileOk = useCallback(
     async (targetFolderId: string) => {
@@ -27,10 +29,18 @@ export const useHandleMoveFile = ({
           clearRowSelection();
         }
         hideMoveFileModal();
+        // 刷新目录树
+        refreshTree();
       }
       return ret;
     },
-    [moveFile, sourceFileIds, hideMoveFileModal, clearRowSelection],
+    [
+      moveFile,
+      sourceFileIds,
+      hideMoveFileModal,
+      clearRowSelection,
+      refreshTree,
+    ],
   );
 
   const handleShowMoveFileModal = useCallback(

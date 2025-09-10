@@ -103,6 +103,30 @@ export function FilesTable({
     fileRenameLoading,
   } = useRenameCurrentFile();
 
+  // 文件夹优先排序函数
+  const createFolderFirstSortFn = (
+    compareValuesCallback: (fileA: IFile, fileB: IFile) => number,
+  ) => {
+    return (rowA: any, rowB: any) => {
+      const fileA = rowA.original;
+      const fileB = rowB.original;
+
+      const isFileAFolder = isFolderType(fileA.type);
+      const isFileBFolder = isFolderType(fileB.type);
+
+      // 如果一个是文件夹，一个是文件，文件夹排在前面
+      if (isFileAFolder && !isFileBFolder) {
+        return -1;
+      }
+      if (!isFileAFolder && isFileBFolder) {
+        return 1;
+      }
+
+      // 如果都是文件夹或都是文件，使用传入的比较函数
+      return compareValuesCallback(fileA, fileB);
+    };
+  };
+
   const columns: ColumnDef<IFile>[] = [
     {
       id: 'select',
@@ -140,6 +164,10 @@ export function FilesTable({
           </Button>
         );
       },
+      // 自定义排序函数：文件夹优先，然后按名称排序
+      sortingFn: createFolderFirstSortFn((fileA, fileB) =>
+        fileA.name.localeCompare(fileB.name),
+      ),
       meta: { cellClassName: 'max-w-[20vw]' },
       cell: ({ row }) => {
         const name: string = row.getValue('name');
@@ -196,6 +224,12 @@ export function FilesTable({
           </Button>
         );
       },
+      // 自定义排序函数：文件夹优先，然后按创建时间排序
+      sortingFn: createFolderFirstSortFn((fileA, fileB) => {
+        const timeA = new Date(fileA.create_time).getTime();
+        const timeB = new Date(fileB.create_time).getTime();
+        return timeA - timeB;
+      }),
       cell: ({ row }) => (
         <div className="lowercase">
           {formatDate(row.getValue('create_time'))}
@@ -215,6 +249,10 @@ export function FilesTable({
           </Button>
         );
       },
+      // 自定义排序函数：文件夹优先，然后按文件大小排序
+      sortingFn: createFolderFirstSortFn(
+        (fileA, fileB) => fileA.size - fileB.size,
+      ),
       cell: ({ row }) => (
         <div className="capitalize">{formatFileSize(row.getValue('size'))}</div>
       ),
