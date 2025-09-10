@@ -1,6 +1,11 @@
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import NewDocumentLink from '@/components/new-document-link';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useDownloadFile } from '@/hooks/file-manager-hooks';
 import { IFile } from '@/interfaces/database/file-manager';
 import {
@@ -17,6 +22,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   UseHandleConnectToKnowledgeReturnType,
   UseRenameCurrentFileReturnType,
@@ -42,6 +48,7 @@ export function ActionCell({
   const isFolder = isFolderType(record.type);
   const extension = getExtension(record.name);
   const isKnowledgeBase = isKnowledgeBaseType(record.source_type);
+  const { t } = useTranslation();
 
   const handleShowConnectToKnowledgeModal = useCallback(() => {
     showConnectToKnowledgeModal(record);
@@ -71,44 +78,72 @@ export function ActionCell({
   return (
     <section className="flex gap-4 items-center text-text-sub-title-invert opacity-0 group-hover:opacity-100 transition-opacity">
       {isKnowledgeBase || (
-        <Button
-          variant="transparent"
-          className="border-none hover:bg-bg-card text-text-primary"
-          size={'sm'}
-          onClick={handleShowConnectToKnowledgeModal}
-        >
-          <Link2 />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="transparent"
+              className="border-none hover:bg-bg-card text-text-primary"
+              size={'sm'}
+              onClick={handleShowConnectToKnowledgeModal}
+            >
+              <Link2 />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>链接到知识库</p>
+          </TooltipContent>
+        </Tooltip>
       )}
       {isKnowledgeBase || (
-        <Button
-          variant="transparent"
-          className="border-none hover:bg-bg-card text-text-primary"
-          size={'sm'}
-          onClick={handleShowMoveFileModal}
-        >
-          <FolderInput />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="transparent"
+              className="border-none hover:bg-bg-card text-text-primary"
+              size={'sm'}
+              onClick={handleShowMoveFileModal}
+            >
+              <FolderInput />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>移动</p>
+          </TooltipContent>
+        </Tooltip>
       )}
       {isKnowledgeBase || (
-        <Button
-          variant="transparent"
-          className="border-none hover:bg-bg-card text-text-primary"
-          size={'sm'}
-          onClick={handleShowFileRenameModal}
-        >
-          <FolderPen />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="transparent"
+              className="border-none hover:bg-bg-card text-text-primary"
+              size={'sm'}
+              onClick={handleShowFileRenameModal}
+            >
+              <FolderPen />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>重命名</p>
+          </TooltipContent>
+        </Tooltip>
       )}
       {isFolder || (
-        <Button
-          variant="transparent"
-          className="border-none hover:bg-bg-card text-text-primary"
-          size={'sm'}
-          onClick={onDownloadDocument}
-        >
-          <ArrowDownToLine />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="transparent"
+              className="border-none hover:bg-bg-card text-text-primary"
+              size={'sm'}
+              onClick={onDownloadDocument}
+            >
+              <ArrowDownToLine />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>下载</p>
+          </TooltipContent>
+        </Tooltip>
       )}
 
       {isSupportedPreviewDocumentType(extension) && (
@@ -117,13 +152,20 @@ export function ActionCell({
           documentName={record.name}
           className="text-text-sub-title-invert"
         >
-          <Button
-            variant="transparent"
-            className="border-none hover:bg-bg-card text-text-primary"
-            size={'sm'}
-          >
-            <Eye />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="transparent"
+                className="border-none hover:bg-bg-card text-text-primary"
+                size={'sm'}
+              >
+                <Eye />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>预览</p>
+            </TooltipContent>
+          </Tooltip>
         </NewDocumentLink>
       )}
 
@@ -152,13 +194,20 @@ export function ActionCell({
       </DropdownMenu> */}
       {isKnowledgeBase || (
         <ConfirmDeleteDialog onOk={onRemoveFile}>
-          <Button
-            variant="transparent"
-            className="border-none hover:bg-bg-card text-text-primary"
-            size={'sm'}
-          >
-            <Trash2 />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="transparent"
+                className="border-none hover:bg-bg-card text-text-primary"
+                size={'sm'}
+              >
+                <Trash2 />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>删除</p>
+            </TooltipContent>
+          </Tooltip>
         </ConfirmDeleteDialog>
       )}
     </section>
