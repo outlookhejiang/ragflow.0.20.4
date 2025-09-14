@@ -1,5 +1,4 @@
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import NewDocumentLink from '@/components/new-document-link';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -34,13 +33,16 @@ import { isFolderType, isKnowledgeBaseType } from './util';
 type IProps = Pick<CellContext<IFile, unknown>, 'row'> &
   Pick<UseHandleConnectToKnowledgeReturnType, 'showConnectToKnowledgeModal'> &
   Pick<UseRenameCurrentFileReturnType, 'showFileRenameModal'> &
-  UseMoveDocumentShowType;
+  UseMoveDocumentShowType & {
+    showFilePreview?: (fileId: string, fileName: string) => void;
+  };
 
 export function ActionCell({
   row,
   showConnectToKnowledgeModal,
   showFileRenameModal,
   showMoveFileModal,
+  showFilePreview,
 }: IProps) {
   const record = row.original;
   const documentId = record.id;
@@ -68,6 +70,10 @@ export function ActionCell({
   const handleShowMoveFileModal = useCallback(() => {
     showMoveFileModal([record.id]);
   }, [record, showMoveFileModal]);
+
+  const handleShowFilePreview = useCallback(() => {
+    showFilePreview?.(record.id, record.name);
+  }, [record, showFilePreview]);
 
   const { handleRemoveFile } = useHandleDeleteFile();
 
@@ -147,51 +153,23 @@ export function ActionCell({
       )}
 
       {isSupportedPreviewDocumentType(extension) && (
-        <NewDocumentLink
-          documentId={documentId}
-          documentName={record.name}
-          className="text-text-sub-title-invert"
-        >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="transparent"
-                className="border-none hover:bg-bg-card text-text-primary"
-                size={'sm'}
-              >
-                <Eye />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>预览</p>
-            </TooltipContent>
-          </Tooltip>
-        </NewDocumentLink>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="transparent"
+              className="border-none hover:bg-bg-card text-text-primary"
+              size={'sm'}
+              onClick={handleShowFilePreview}
+            >
+              <Eye />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>预览</p>
+          </TooltipContent>
+        </Tooltip>
       )}
 
-      {/* <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="transparent"
-        className="border-none" size={'sm'}>
-            <EllipsisVertical />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleShowMoveFileModal}>
-            {t('common.move')}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleShowFileRenameModal}>
-            {t('common.rename')}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          {isFolder || (
-            <DropdownMenuItem onClick={onDownloadDocument}>
-              {t('common.download')}
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu> */}
       {isKnowledgeBase || (
         <ConfirmDeleteDialog onOk={onRemoveFile}>
           <Tooltip>

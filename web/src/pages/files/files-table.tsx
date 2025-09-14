@@ -47,9 +47,11 @@ import { pick } from 'lodash';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionCell } from './action-cell';
+import { FilePreviewModal } from './file-preview-modal';
 import { useHandleConnectToKnowledge, useRenameCurrentFile } from './hooks';
 import { KnowledgeCell } from './knowledge-cell';
 import { LinkToDatasetDialog } from './link-to-dataset-dialog';
+import { useFilePreview } from './use-file-preview';
 import { UseMoveDocumentShowType } from './use-move-file';
 import { useNavigateToOtherFolder } from './use-navigate-to-folder';
 import { isFolderType, isKnowledgeBaseType } from './util';
@@ -102,6 +104,8 @@ export function FilesTable({
     initialFileName,
     fileRenameLoading,
   } = useRenameCurrentFile();
+
+  const { previewState, showFilePreview, hideFilePreview } = useFilePreview();
 
   // 文件夹优先排序函数
   const createFolderFirstSortFn = (
@@ -181,10 +185,7 @@ export function FilesTable({
           } else {
             const extension = getExtension(name);
             if (isSupportedPreviewDocumentType(extension)) {
-              window.open(
-                `/document/${id}?ext=${extension}&prefix=file`,
-                '_blank',
-              );
+              showFilePreview(id, name);
             }
           }
         };
@@ -277,6 +278,7 @@ export function FilesTable({
             showConnectToKnowledgeModal={showConnectToKnowledgeModal}
             showFileRenameModal={showFileRenameModal}
             showMoveFileModal={showMoveFileModal}
+            showFilePreview={showFilePreview}
           ></ActionCell>
         );
       },
@@ -394,6 +396,14 @@ export function FilesTable({
           initialName={initialFileName}
           loading={fileRenameLoading}
         ></RenameDialog>
+      )}
+      {previewState.visible && (
+        <FilePreviewModal
+          visible={previewState.visible}
+          hideModal={hideFilePreview}
+          fileName={previewState.fileName}
+          fileId={previewState.fileId}
+        />
       )}
     </>
   );
