@@ -111,16 +111,17 @@ export function Header() {
         <img
           src={'/logo.svg'}
           alt="logo"
-          className="size-10 mr-[12] cursor-pointer"
+          className="size-16 mr-[12] cursor-pointer"
           onClick={handleLogoClick}
         />
         <a
           className="flex items-center gap-1.5 text-text-secondary"
           target="_blank"
-          href="https://github.com/infiniflow/ragflow"
+          // href="https://github.com/infiniflow/ragflow"
+          href="http://netsmart.cn"
           rel="noreferrer"
         >
-          <Github className="size-4" />
+          {/* <Github className="size-4" /> */}
           {/* <span className=" text-base">21.5k stars</span> */}
         </a>
       </div>
@@ -145,12 +146,12 @@ export function Header() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant={'ghost'} onClick={handleDocHelpCLick}>
+        {/* <Button variant={'ghost'} onClick={handleDocHelpCLick}>
           <CircleHelp />
-        </Button>
-        <Button variant={'ghost'} onClick={onThemeClick}>
+        </Button> */}
+        {/* <Button variant={'ghost'} onClick={onThemeClick}>
           {theme === 'light' ? <Sun /> : <Moon />}
-        </Button>
+        </Button> */}
         <BellButton></BellButton>
         <div className="relative">
           <RAGFlowAvatar
